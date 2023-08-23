@@ -13,7 +13,20 @@ void sensorFusion(double m1[][mapWidth], double m2[][mapWidth])
     //a  b
     //c  d
 
+    double fused[mapHeight][mapWidth];
 
+    for (int i = 0; i < mapHeight; i++) {
+        for (int j = 0; j < mapWidth; j++) {
+            fused[i][j] = 1 - (1 - m1[i][j]) * (1 - m2[i][j]);
+        }
+    }
+
+    for (int i = 0; i < mapHeight; i++) {
+        for (int j = 0; j < mapWidth; j++) {
+            std::cout << fused[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
 
 }
 
