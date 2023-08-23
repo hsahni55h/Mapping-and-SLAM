@@ -1,0 +1,77 @@
+Mapping:
+
+Assumption: Robot's Trajectory
+Estimation: Map
+
+A mobile robot is mapping a large environment while traveling in cycles and correlating between different objects seen at different points in time. 
+These are the challenges and difficulties faced by this robot:
+ 
+Challenge - Unknown Map
+Challenge - Huge Hypothesis Space
+Difficulty - Size
+Difficulty - Noise
+Difficulty - Perceptual Ambiguity
+Difficulty - Cycles
+
+The inputs and outputs to the Mapping with Known Poses problem:
+
+Inputs: Poses + Measurements, Output: Map
+
+
+The number of maps that can be formed out of the grid cells is equal to 2^no_of_grid_cells.
+
+-----------------------------------------------------------------------------------------------------------------
+
+Computing the Posterior:
+
+
+First Approach: P(m|z[1:t],x[1:t])
+We just saw that maps have high dimensionality so it will be too pricey in terms of computational memory to compute the posterior under this first approach.
+
+Second Approach:P(m_i|z[1:t],x[1:t])
+A second or better approach to estimating the posterior map is to decompose this problem into many separate problems. 
+In each of these problems, we will compute the posterior map mi at each instant.
+However, this approach still presents some drawbacks because we are computing the probability of each cell independently. 
+Thus, we still need to find a different approach that addresses the dependencies between neighboring cells.
+
+Third Approach:Ⲡ_i(P(m_i|z[1:t],x[1:t]))
+the third approach is the best approach to computing the posterior map by relating cells and overcoming the huge computational memory, 
+is to estimate the map with the product of marginals or factorization.
+-----------------------------------------------------------------------------------------------------------------
+Forward vs. Inverse Measurement Model
+
+Forward Measurement Model - P(z1:t | x): Estimating a posterior over the measurement given the system state.
+
+Inverse Measurement Model - P(x | z1:t): Estimating a posterior over the system state given the measurement.
+
+(binary bayes filter will solve the inverse measurement problem with log odds ratio. 
+The advantage of using a log odds ratio representation is to avoid probability instabilities near 0 or 1. 
+Another advantage relates to system speed, accuracy, and simplicity.)
+
+The inverse measurement model is generally used when measurements are more complex than the system's state.
+
+-----------------------------------------------------------------------------------------------------------------
+Binary Bayes Filter Algorithm
+
+l_t = l_(t-1) + log(p(x∣z_t)/(1−p(x∣z_t))) - log(p(x)/(1-p(x)))
+
+​l_t = New belief
+l_(t-1) = previous belief
+log(p(x∣z_t)/(1−p(x∣z_t))) = log odd of the inverse measurements model 
+log(p(x)/(1-p(x))) = inital belief
+ 
+
+​Input
+The binary Bayes filter algorithm computes the log odds of the posterior belief denoted by lt.
+Initially, the filter takes the previous log odds ratio of the belief t-1 and the measurements zt as parameters.
+
+Computation
+Then, the filter computes the new posterior belief of the system lt by adding the previous belief lt-1 to the log odds ratio 
+of the inverse measurement model ​and subtracting the prior probability state also known by initial belief. 
+The initial belief represents the initial state of the system before taking any sensor measurements into consideration.
+
+Output
+Finally, the algorithm returns the posterior belief of the system lt, and a new iteration cycle begins.
+
+-----------------------------------------------------------------------------------------------------------------
+
