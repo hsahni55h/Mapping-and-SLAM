@@ -1,0 +1,134 @@
+Online SLAM Problem
+
+At time t-1, the robot will estimate its current pose xt-1 and the map m given its current measurements zt-1 and controls ut-1.
+At time t, the robot will estimate its new pose xt and the map m given only its current measurements zt and controls ut.
+At time t+1, the robot will estimate its current pose xt+1 and the map m given the measurements zt+1 and controls ut+1.
+
+This problem can be modeled with the probability equation p(xt , m | z1:t , u1:t) 
+where we solve the posterior represented by the instantaneous pose xt and the map m given the measurements z[1:t] and controls u[1:t]. 
+
+Robot estimates its current pose and the map using current measurements and controls. 
+Thus, with online SLAM we estimate variables that occur at time t only.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+Full SLAM Problem
+
+At time t-1, the robot will estimate the robot pose xt-1 and map m, given the measurements **zt-1 **and controls ut-1.
+At time t, the robot will estimate the entire path xt-1:t and map m, given all the measurements zt-1:t and controls ut-1:t.
+At time t+1, the robot will estimate the entire path xt-1:t+1 and map m, given all the measurements zt-1:t+1 and controls ut-1:t+1.
+
+This problem can be modeled with the probability equation p(x1:t , m | z1:t u1:t), 
+where we solve the posterior represented by the robot's trajectory x1:t and the map m given all the measurements z1:t and controls u1:t. 
+
+Robot estimates its entire trajectory and the map using all the measurements and controls.
+Thus, with full SLAM problem we estimate all the variables that occur throughout the robot travel time.
+
+---------------------------------------------------------------------------------------------------------------------------------
+Nature of SLAM
+
+The online SLAM problem computes a posterior over the current pose along with the map and 
+the full SLAM problem computes a posterior over the entire path along with the map.
+
+Nature
+Now, the second key feature of the SLAM problem relates to its nature.
+SLAM problems generally have a continuous and a discrete element.
+
+Nature - Continuous
+During SLAM, a robot continuously collects odometry information to estimate the robot poses and 
+continuously senses the environment to estimate the location of the object or landmark. 
+Thus, both robots poses and object location are continuous aspects of the SLAM problem.
+Robot continuously senses its pose and the location of the objects.
+
+"continuous" =  object locations and robot poses
+
+Nature - Discrete
+As I mentioned earlier, robots continuously sense the environment to estimate the location of the objects, 
+when doing so SLAM algorithms have to identify if a relation exists between any newly detected objects and previously detected ones. 
+This helps the robot understand if it has been in this same location before. 
+At each moment, the robot has to answer the question, “Have I been here before?”. 
+The answer to this question is binary - either yes or no - and that’s what makes the relation between objects a discrete component of the SLAM problem.
+This discrete relation between objects is known by correspondence.
+Robot has to identify if a relation exists between any newly detected and previously detected objects.
+"discrete" = correspondence
+---------------------------------------------------------------------------------------------------------------------------------
+
+SLAM Challenges
+Computing the full posterior composed of the robot pose, the map and the correspondence under SLAM poses a big challenge in robotics mainly due to the continuous and discrete portion.
+
+Continuous
+The continuous parameter space composed of the robot poses and the location of the objects is highly dimensional. 
+While mapping the environment and localizing itself, the robot will encounter many objects and have to keep track of each one of them. 
+Thus, the number of variables will increase with time, and this makes the problem highly dimensional and challenging to compute the posterior.
+
+Discrete
+Next, the discrete parameter space is composed out of the correspondence values, and is also highly dimensional due to the large number of correspondence variables. 
+Not only that, the correspondence values increase exponentially over time since the robot will keep sensing the environment and relating the newly detected objects to the previously detected ones. 
+Even if you assume known correspondence values, the posterior over maps is still highly dimensional as we saw in the mapping lessons.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+The FastSLAM algorithm solves the Full SLAM problem with known correspondences.
+
+Estimating the Trajectory: FastSLAM estimates a posterior over the trajectory using a particle filter approach. 
+                            This will give an advantage to SLAM to solve the problem of mapping with known poses.
+
+Estimating the Map: FastSLAM uses a low dimensional Extended Kalman Filter to solve independent features of the map which are modeled with local Gaussian.
+
+The custom approach of representing the posterior with particle filter and Gaussian is known by the Rao-Blackwellized particle filter approach.
+
+FastSLAM estimates the full robot path, and hence it solves the Full SLAM problem.
+On the other hand, each particle in FastSLAM estimates instantaneous poses, and thus FastSLAM also solves the Online SLAM problem.
+
+---------------------------------------------------------------------------------------------------------------------------------
+three different instances of the FastSLAM algorithm exist.
+
+FastSLAM 1.0
+The FastSLAM 1.0 algorithm is simple and easy to implement, but this algorithm is known to be inefficient since particle filters generate sample inefficiency.
+
+FastSLAM 2.0
+The FastSLAM 2.0 algorithm overcomes the inefficiency of FastSLAM 1.0 by imposing a different distribution, which results in a low number of particles. 
+Keep in mind that both of the FastSLAM 1.0 and 2.0 algorithms use a low dimensional Extended Kalman filter to estimate the posterior over the map features.
+
+Grid-based FastSLAM
+The third instance of FastSLAM is really an extension to FastSLAM known as the grid-based FastSLAM algorithm, which adapts FastSLAM to grid maps. 
+---------------------------------------------------------------------------------------------------------------------------------
+
+FastSLAM 1.0 & 2.0
+The main advantage of the FastSLAM algorithm is that it uses a particle filter approach to solve the SLAM problem. 
+Each particle will hold a guess of the robot trajectory, and by doing so, the SLAM problem is reduced to mapping with known poses.
+But, in fact, this algorithm presents a big disadvantage since it must always assume that there are known landmark positions, and thus with FastSLAM we are not able to model an arbitrary environment. 
+Now, what if landmark positions are unavailable to us? Are we still able to solve the SLAM problem?
+
+Grid-based FastSLAM
+Yes, with the grid mapping algorithm you can model the environment using grid maps without predefining any landmark position. 
+So by extending the FastSLAM algorithm to occupancy grid maps, you can now solve the SLAM problem in an arbitrary environment. 
+While mapping a real-world environment, you will mostly be using mobile robots equipped with range sensors. 
+You’ll then extend the FastSLAM algorithm and solve the SLAM problem in term of grid maps.
+
+Just as in the FastSLAM algorithm, with the grid-based FastSLAM each particle holds a guess of the robot trajectory.
+In addition, each particle maintains its own map. The grid-based FastSLAM algorithm will update each particle by solving the mapping with known poses problem using the occupancy grid mapping algorithm.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+To adapt FastSLAM to grid mapping, we need three different techniques:
+
+Sampling Motion- p(x_{t} | x_{t-1}^{[k]} , u_{t}):
+         Estimates the current pose given the k-th particle previous pose and the current controls u.
+
+Map Estimation- p(m_{t} | z_{t}, x_{t}^{[k]} , m_{t-1}^{[k]}): 
+                Estimates the current map given the current measurements, 
+                the current k-th particle pose, and the previous k-th particle map
+
+Importance Weight- p(z_{t} | x_{t}^{[k]} , m^{[k]})</span>: 
+Estimates the current likelihood of the measurement given the current k-th particle pose and the current k-th particle map.
+
+** Sampling motion technique can be solved with MCL
+** Importance weight technique can be solved with MCL.
+** Map estimation technique can be solved with Occupancy Grid Mapping.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+Gmapping uses the grid based fast slam algorithm
+gmapping provides laser based SLAM. Meaning that you can feed its node with the robot laser measurements and odometry values and expect it to provide you with a 2D occupancy grid map of the environment. 
+The map will be updated as the robot moves and collect sensory information using its laser range finder sensor.
