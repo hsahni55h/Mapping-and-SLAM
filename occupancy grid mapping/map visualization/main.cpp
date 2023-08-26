@@ -93,9 +93,9 @@ void visualization()
     plt::xlim(0, int(mapWidth/gridWidth));
     plt::ylim(0, int(mapHeight/gridHeight));
 
-    for (int x = 0; x < mapWidth / gridWidth; x++) 
+    for (double x = 0; x < mapWidth / gridWidth; x++) 
     {
-        for (int y = 0; y < mapHeight / gridHeight; y++) 
+        for (double y = 0; y < mapHeight / gridHeight; y++) 
         {
             if (l[x][y] == 0)
             {
