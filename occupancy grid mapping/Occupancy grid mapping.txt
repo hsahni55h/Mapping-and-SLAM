@@ -87,10 +87,21 @@ Algorithm occupancy_grid_mapping ({l_(t-1,i)}, x_t, z_t):
     endfor
 
 -----------------------------------------------------------------------------------------------------------------
+Inverse Sensor Model
 
+m_{i}: Map at instant i or current cell that is being processed
 
+x_{i},y_{i}: Center of mass of the current cell mi
 
+r: Range of the center of mass computed with respect to robot pose and center of mass
 
+k: The sonar rangefinder cone that best aligns with the cell being considered computed with respect to the 
+robot pose (x,y,θ), center of mass (xi,yi), and sensor angle.
+
+beta: Opening angle of the conical region formed out of the measurement beams.
+
+alpha: Width of obstacles which is almost equal to the size of a cell. 
+        Alpha is not the width of the conical region but instead it's the width of a cell.
 
 -----------------------------------------------------------------------------------------------------------------
 

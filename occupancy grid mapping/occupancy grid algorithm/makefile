@@ -4,7 +4,7 @@
 CC = g++
 
 # Compiler flags
-CFLAGS = -std=c++11 -Wall
+CFLAGS = -std=c++11 -Wall -g3
 
 # Source file and target executable
 SRC = main.cpp
